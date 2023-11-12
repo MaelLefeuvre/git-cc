@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-import os, sys, shutil, inspect
-import argparse
+import os, sys, shutil, inspect, argparse
+from glob import glob
+import pathlib
 
 def get_shell_width():
     return shutil.get_terminal_size().columns
@@ -47,18 +48,24 @@ def hello(*args, **kwargs):
     print("hello git!")
 
 def git_finder(args):
-    for path in args.paths:
+    search_git_repo(paths=args.paths, recursive=args.recursive)
+
+def search_git_repo(paths=["."], recursive=True, step=0):
+    for path in paths:
         try:
             if has_git_repo(path):
-                message = f"gitted          {path}"
+                message = f"- gitted          {path}"
             else:
-                message = f"ungitted        {path}"
+                message = f"- ungitted        {path}"
         except NotADirectoryError:
-            message = f"not a directory {path}"
+            message = f"- not a directory {path}"
         except FileNotFoundError:
-            message = f"does not exist  {path}"
+            message = f"- does not exist  {path}"
         finally:
-            print(message)
+            print(f"{' ' * step * 2}{message}")
+        
+        if recursive and path != ".git":
+            search_git_repo(paths=glob(os.path.join(path, "*")), step=step+1)
         
 if __name__ == '__main__':
     # ---- Setup CLI argument parser
@@ -73,6 +80,9 @@ if __name__ == '__main__':
     zen_parser.set_defaults(func=recite_zen_of_python)
     # Git finder module 
     git_parser = subparsers.add_parser("git-finder", help='git-finder help')
+    git_parser.add_argument("-r", "--recursive", action="store_true",
+        help="search recursively within all provided paths"
+    )
     git_parser.add_argument("paths", default=["."], nargs=argparse.REMAINDER)
     git_parser.set_defaults(func=git_finder)
     # ---- Parse arguments
