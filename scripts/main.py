@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-import os, sys, shutil
+import os, sys, shutil, inspect
 import argparse
+
+def get_shell_width():
+    return shutil.get_terminal_size().columns
 
 def sep_line(width=None, sep='─', file=sys.stdout):
     """
@@ -13,8 +16,17 @@ def sep_line(width=None, sep='─', file=sys.stdout):
 
     Return: None
     """
-    width = shutil.get_terminal_size().columns if width is None else width
+    width = get_shell_width() if width is None else width
     print(sep * width, file=file)
+
+
+def get_function_name(stack_index=1, func=None):
+    return inspect.stack()[stack_index].function if func is None else func.__name__
+
+def print_module_header(func=None):
+    module_name=get_function_name(stack_index=2, func=func).replace("_", "-")
+    print(f"Running module '{module_name}'".center(get_shell_width()))
+    sep_line()
 
 
 def recite_zen_of_python(*args, **kwargs):
@@ -34,7 +46,7 @@ def has_git_repo(path="."):
 def hello(*args, **kwargs):
     print("hello git!")
 
-def main(args):
+def git_finder(args):
     for path in args.paths:
         try:
             if has_git_repo(path):
@@ -62,7 +74,7 @@ if __name__ == '__main__':
     # Git finder module 
     git_parser = subparsers.add_parser("git-finder", help='git-finder help')
     git_parser.add_argument("paths", default=["."], nargs=argparse.REMAINDER)
-    git_parser.set_defaults(func=main)
+    git_parser.set_defaults(func=git_finder)
     # ---- Parse arguments
     args = main_parser.parse_args()
 
@@ -73,6 +85,7 @@ if __name__ == '__main__':
 
     # ---- Main
     try:
+        print_module_header(args.func)
         args.func(args)
         sep_line()
         print("Done!")
