@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-import os
+import shutil
 
 
 def sep_line(width=None, sep='─', file=sys.stdout):
@@ -14,7 +14,7 @@ def sep_line(width=None, sep='─', file=sys.stdout):
 
     Return: None
     """
-    width = os.get_terminal_size().columns if width is None else width
+    width = shutil.get_terminal_size().columns if width is None else width
     print(sep * width, file=file)
 
 def main():
