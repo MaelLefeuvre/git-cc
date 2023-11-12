@@ -31,8 +31,10 @@ def has_git_repo(path="."):
     """
     return ".git" in os.listdir(path)
 
-def main(args):
+def hello(*args, **kwargs):
     print("hello git!")
+
+def main(args):
     for path in args.paths:
         try:
             if has_git_repo(path):
@@ -51,6 +53,9 @@ if __name__ == '__main__':
     main_parser = argparse.ArgumentParser("git-cc", description='Ma thèse en 180 commits')
     subparsers = main_parser.add_subparsers(help='sub-command help')
 
+    # Hello module
+    hello_parser = subparsers.add_parser("hello", help="hello help")
+    hello_parser.set_defaults(func=hello)
     # Zen reciter module
     zen_parser = subparsers.add_parser("zen", help='zen help')
     zen_parser.set_defaults(func=recite_zen_of_python)
@@ -61,6 +66,12 @@ if __name__ == '__main__':
     # ---- Parse arguments
     args = main_parser.parse_args()
 
+    # ---- Print usage if no arguments provided
+    if len(sys.argv)==1:
+        main_parser.print_help(file=sys.stderr)
+        sys.exit(1)
+
+    # ---- Main
     try:
         args.func(args)
         sep_line()
