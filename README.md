@@ -1,1 +1,1 @@
-# Git crash course
+# Git crash course (with shiny new features)
