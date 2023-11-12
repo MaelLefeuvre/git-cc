@@ -1,1 +1,1 @@
-# Git crash course (sameol' features)
+# Git crash course (with shiny new features!)
