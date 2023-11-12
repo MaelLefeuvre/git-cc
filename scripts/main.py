@@ -48,13 +48,15 @@ def hello(*args, **kwargs):
     print("hello git!")
 
 def git_finder(args):
-    search_git_repo(paths=args.paths, recursive=args.recursive)
+    search_git_repo(paths=args.paths, recursive=args.recursive, print_all=args.all)
 
-def search_git_repo(paths=["."], recursive=True, step=0):
+def search_git_repo(paths=["."], recursive=True, step=0, print_all=True):
     for path in paths:
+        found = False
         try:
             if has_git_repo(path):
                 message = f"- gitted          {path}"
+                found = True
             else:
                 message = f"- ungitted        {path}"
         except NotADirectoryError:
@@ -62,10 +64,11 @@ def search_git_repo(paths=["."], recursive=True, step=0):
         except FileNotFoundError:
             message = f"- does not exist  {path}"
         finally:
-            print(f"{' ' * step * 2}{message}")
+            if found or print_all:
+                print(f"{' ' * step * 2}{message}")
         
         if recursive and path != ".git":
-            search_git_repo(paths=glob(os.path.join(path, "*")), step=step+1)
+            search_git_repo(paths=glob(os.path.join(path, "*")), step=step+1, print_all=print_all)
         
 if __name__ == '__main__':
     # ---- Setup CLI argument parser
@@ -82,6 +85,9 @@ if __name__ == '__main__':
     git_parser = subparsers.add_parser("git-finder", help='git-finder help')
     git_parser.add_argument("-r", "--recursive", action="store_true",
         help="search recursively within all provided paths"
+    )
+    git_parser.add_argument("-a", "--all", action="store_true",
+        help="Print every directory's status"
     )
     git_parser.add_argument("paths", default=["."], nargs=argparse.REMAINDER)
     git_parser.set_defaults(func=git_finder)
