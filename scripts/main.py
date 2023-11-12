@@ -48,9 +48,10 @@ def hello(*args, **kwargs):
     print("hello git!")
 
 def git_finder(args):
-    search_git_repo(paths=args.paths, recursive=args.recursive, print_all=args.all)
+    print(args)
+    search_git_repo(**vars(args))
 
-def search_git_repo(paths=["."], recursive=True, step=0, print_all=True):
+def search_git_repo(paths=["."], recursive=True, shift=0, print_all=True, hierarchical=False, **kwargs):
     for path in paths:
         found = False
         try:
@@ -65,10 +66,16 @@ def search_git_repo(paths=["."], recursive=True, step=0, print_all=True):
             message = f"- does not exist  {path}"
         finally:
             if found or print_all:
-                print(f"{' ' * step * 2}{message}")
+                shift_txt = f"{' ' * shift * 2}" if hierarchical else ""
+                print(f"{shift_txt}{message}")
         
         if recursive and path != ".git":
-            search_git_repo(paths=glob(os.path.join(path, "*")), step=step+1, print_all=print_all)
+            search_git_repo(
+                paths=glob(os.path.join(path, "*")),
+                shift=shift+1,
+                print_all=print_all,
+                hierarchical=hierarchical
+            )
         
 if __name__ == '__main__':
     # ---- Setup CLI argument parser
@@ -86,8 +93,11 @@ if __name__ == '__main__':
     git_parser.add_argument("-r", "--recursive", action="store_true",
         help="search recursively within all provided paths"
     )
-    git_parser.add_argument("-a", "--all", action="store_true",
+    git_parser.add_argument("-a", "--all", dest="print_all", action="store_true",
         help="Print every directory's status"
+    )
+    git_parser.add_argument("-H", "--hierarchical", action="store_true",
+        help="Shift printing according to directory depth"
     )
     git_parser.add_argument("paths", default=["."], nargs=argparse.REMAINDER)
     git_parser.set_defaults(func=git_finder)
