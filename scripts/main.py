@@ -17,9 +17,14 @@ def sep_line(width=None, sep='─', file=sys.stdout):
     width = shutil.get_terminal_size().columns if width is None else width
     print(sep * width, file=file)
 
+
+def recite_zen_of_python():
+    import this
+
 def main():
     print("hello git!")
     sep_line()
+    recite_zen_of_python()
 
 if __name__ == '__main__':
     main()
