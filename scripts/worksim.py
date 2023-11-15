@@ -31,7 +31,7 @@ class WorkSimulator(object):
         """
         Wait for an interval that is randomly sampled from a lognormal distribution
         """
-        time.sleep(np.random.normal(mean, sigma, size=None))
+        time.sleep(np.random.lognormal(mean, sigma, size=None))  # Fixed with love, xoxo, UserLambda
 
     def fake_work(self):
         while True:
