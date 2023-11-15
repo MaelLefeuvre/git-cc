@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-import os, sys, shutil, inspect, argparse
+import os, sys, shutil, inspect, argparse, pathlib
 from glob import glob
-import pathlib
+
+import worksim
 
 def get_shell_width():
     return shutil.get_terminal_size().columns
@@ -49,7 +50,7 @@ def hello(*args, **kwargs):
 
 def git_finder(args):
     print(args)
-    search_git_repo(**vars(args))
+    search_git_repo(**vars(args))        
 
 def search_git_repo(paths=["."], recursive=True, shift=0, print_all=True, hierarchical=False, **kwargs):
     for path in paths:
@@ -77,7 +78,12 @@ def search_git_repo(paths=["."], recursive=True, shift=0, print_all=True, hierar
                 hierarchical=hierarchical
             )
         
+def run_worksim(*args, **kwargs):
+    work_faker = worksim.WorkSimulator()
+    work_faker.fake_work()
+
 if __name__ == '__main__':
+
     # ---- Setup CLI argument parser
     main_parser = argparse.ArgumentParser("git-cc", description='Ma thèse en 180 commits')
     subparsers = main_parser.add_subparsers(help='sub-command help')
@@ -101,6 +107,9 @@ if __name__ == '__main__':
     )
     git_parser.add_argument("paths", default=["."], nargs=argparse.REMAINDER)
     git_parser.set_defaults(func=git_finder)
+    # worksim module
+    worksim_parser = subparsers.add_parser("fake-work", help='fake-work help')
+    worksim_parser.set_defaults(func=run_worksim)
     # ---- Parse arguments
     args = main_parser.parse_args()
 
