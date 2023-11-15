@@ -1,0 +1,8 @@
+# Any directory named '__pycache__
+__pycache__/
+
+# Any file ending with '.tmp'
+*.tmp 
+
+# ...expect that very important temporary file, located in data
+!/data/important.tmp
